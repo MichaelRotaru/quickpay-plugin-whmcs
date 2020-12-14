@@ -1,20 +1,8 @@
 <?php
 /**
- * WHMCS Sample Payment Callback File
+ * WHMCS QuickPay Payment Gateway Module
  *
- * This sample file demonstrates how a payment gateway callback should be
- * handled within WHMCS.
- *
- * It demonstrates verifying that the payment gateway module is active,
- * validating an Invoice ID, checking for the existence of a Transaction ID,
- * Logging the Transaction for debugging and Adding Payment to an Invoice.
- *
- * For more information, please refer to the online documentation.
- *
- * @see https://developers.whmcs.com/payment-gateways/callbacks/
- *
- * @copyright Copyright (c) WHMCS Limited 2017
- * @license http://www.whmcs.com/license/ WHMCS Eula
+ * For more information, please refer to the online documentation: https://developers.whmcs.com/payment-gateways/callbacks/
  */
 
 /** Require libraries needed for gateway module functions. */
@@ -24,6 +12,7 @@ require_once __DIR__ . '/../../../includes/invoicefunctions.php';
 
 /** Detect module name from filename. */
 $gatewayModuleName = basename(__FILE__, '.php');
+
 /** Fetch gateway configuration parameters. */
 $gateway = getGatewayVariables($gatewayModuleName);
 
@@ -53,16 +42,19 @@ if ($checksum === $_SERVER["HTTP_QUICKPAY_CHECKSUM_SHA256"]) {
     $operationType = $operation->type;
     $transid = $request->id;
     $invoiceid = $request->order_id;
+
     /** Strip prefix if any*/
     if (isset($gateway['prefix'])) {
         $invoiceid = substr(explode('_', $invoiceid)[0], strlen($gateway['prefix']));
     }
+
     /** Convert amount to decimal type */
     $amount = ($operation->amount / 100.0);
 
     /** In order to find any added fee, we must find the original order amount in the database */
     $tblinvoices_query = select_query("tblinvoices", "id,total", array("id" => $invoiceid));
     $tblinvoices = mysql_fetch_array($tblinvoices_query);
+
     /* Calculate the fee */
     $fee = $amount - $tblinvoices['total'];
 
@@ -94,19 +86,22 @@ if ($checksum === $_SERVER["HTTP_QUICKPAY_CHECKSUM_SHA256"]) {
     checkCbTransID($transid);
 
     /** If request is accepted, authorized and qp status is ok*/
-    if ($request->accepted && ($operationType=='authorize' || $operationType=='recurring') && $operation->qp_status_code == "20000") {
+    if ($request->accepted && (('authorize' == $operationType) || ('recurring' == $operationType)) && ("20000" == $operation->qp_status_code)) {
 
         /** Add transaction to Invoice */
-        if (($orderType == "Subscription" && $operationType != 'authorize') || $orderType != "Subscription") {
+        if ((("Subscription" == $orderType) && ('authorize' != $operationType)) || ("Subscription" != $orderType)) {
             /** Admin username needed for api commands */
             $adminuser = $gateway['whmcs_adminname'];
+
             /** Api request parameters */
-            $values = [ 'invoiceid' => $invoiceid
-                      , 'transid' => $transid
-                      , 'amount' => $amount
-                      , 'fee' => $fee
-                      , 'gateway' => $gatewayModuleName
-                      ];
+            $values = [
+                'invoiceid' => $invoiceid,
+                'transid' => $transid,
+                'amount' => $amount,
+                'fee' => $fee,
+                'gateway' => $gatewayModuleName
+            ];
+
             /**
              * Add Invoice Payment.
              *
@@ -121,12 +116,14 @@ if ($checksum === $_SERVER["HTTP_QUICKPAY_CHECKSUM_SHA256"]) {
             localAPI("addinvoicepayment", $values, $adminuser);
 
             /** Add the fee to Invoice */
-            if ($fee>0) {
-                $values = [ 'invoiceid' => $invoiceid
-                          , 'newitemdescription' => array("Payment fee")
-                          , 'newitemamount' => array($fee)
-                          , 'newitemtaxed' => array("0")
-                          ];
+            if (0 < $fee) {
+                $values = [
+                    'invoiceid' => $invoiceid,
+                    'newitemdescription' => array("Payment fee"),
+                    'newitemamount' => array($fee),
+                    'newitemtaxed' => array("0")
+                ];
+
                 /** Update invoice request */
                 localAPI("updateinvoice", $values, $adminuser);
             }
@@ -138,67 +135,58 @@ if ($checksum === $_SERVER["HTTP_QUICKPAY_CHECKSUM_SHA256"]) {
         /** If Subscription */
         if ($recurringData && isset($recurringData['primaryserviceid'])) {
             /** In order to find any added fee, we must find the original order amount in the database */
-            $query_quickpay_transaction = select_query("quickpay_transactions", "transaction_id,paid", array("transaction_id" => (int)$transid));
+            $query_quickpay_transaction = select_query("quickpay_transactions", "transaction_id,paid", ["transaction_id" => (int)$transid]);
             $quickpay_transaction = mysql_fetch_array($query_quickpay_transaction);
 
-            if ($quickpay_transaction['paid'] == '0') {
+            if ('0' == $quickpay_transaction['paid']) {
                 if ($operation->type=='authorize') {
                     /** Paid 1 on subscription parent record = authorized */
-                    full_query("UPDATE quickpay_transactions SET paid = '1' WHERE transaction_id = '".(int)$transid."'");
+                    full_query("UPDATE quickpay_transactions SET paid = '1' WHERE transaction_id = '" . (int)$transid . "'");
 
                     require_once __DIR__ . '/../../../modules/gateways/quickpay.php';
+
                     /** Payment link from response */
                     $linkArray = json_decode(json_encode($request->link), true);
+
                     /** Recurring payment parameters */
-                    $params = [ "amount"                                => number_format(($linkArray['amount']/100.0), 2, '.', '') /** Convert amount to decimal */
-                              , "returnurl"                             => $linkArray['continue_url']
-                              , "systemurl"                             => $linkArray['callback_url']
-                              , "clientdetails"                         => ['email' => $linkArray['customer_email']]
-                              , "payment_methods"                       => $linkArray['payment_methods']
-                              , "language"                              => $linkArray['language']
-                              , "autocapture"                           => $gateway['autocapture']
-                              , "autofee"                               => $gateway['autofee']
-                              , "quickpay_branding_id"                  => $gateway['quickpay_branding_id']
-                              , "quickpay_google_analytics_tracking_id" => $gateway['quickpay_google_analytics_tracking_id']
-                              , "quickpay_google_analytics_client_id"   => $gateway['quickpay_google_analytics_client_id']
-                              , "apikey"                                => $gateway['apikey']
-                              , "invoiceid"                             => $invoiceid
-                              ];
+                    $params = [
+                        "amount" => number_format(($linkArray['amount']/100.0), 2, '.', ''), /** Convert amount to decimal */
+                        "returnurl" => $linkArray['continue_url'],
+                        "systemurl" => $linkArray['callback_url'],
+                        "clientdetails" => ['email' => $linkArray['customer_email']],
+                        "payment_methods" => $linkArray['payment_methods'],
+                        "language" => $linkArray['language'],
+                        "autocapture" => $gateway['autocapture'],
+                        "autofee" => $gateway['autofee'],
+                        "quickpay_branding_id" => $gateway['quickpay_branding_id'],
+                        "quickpay_google_analytics_tracking_id" => $gateway['quickpay_google_analytics_tracking_id'],
+                        "quickpay_google_analytics_client_id" => $gateway['quickpay_google_analytics_client_id'],
+                        "apikey" => $gateway['apikey'],
+                        "invoiceid" => $invoiceid
+                    ];
 
                     /** SET subscription id in tblhosting if is empty, in order to enable autobiling and cancel methods*/
-                    update_query("tblhosting", array("subscriptionid" => $transid), array("id" => $recurringData['primaryserviceid'],"subscriptionid" => ''));
+                    update_query("tblhosting", ["subscriptionid" => $transid], ["id" => $recurringData['primaryserviceid'], "subscriptionid" => '']);
 
                     /** Trigger recurring payment */
                     helper_create_payment_link($transid/** Subscription ID */, $params, 'recurring');
                 } else {
-                    /* If recurring payment succeeded set transaction as paid */
-                    full_query("UPDATE quickpay_transactions SET paid = '1' WHERE transaction_id = '".(int)$transid."'");
+                    /**  If recurring payment succeeded set transaction as paid */
+                    full_query("UPDATE quickpay_transactions SET paid = '1' WHERE transaction_id = '" . (int)$transid . "'");
                 }
             }
             /** If Simple Payment */
         } else {
             /** Mark payment in custom table as processed */
-            full_query("UPDATE quickpay_transactions SET paid = '1' WHERE transaction_id = '".(int)$transid."'");
+            full_query("UPDATE quickpay_transactions SET paid = '1' WHERE transaction_id = '" . (int)$transid . "'");
         }
-        /**
-         * Log Transaction.
-         *
-         * Add an entry to the Gateway Log for debugging purposes.
-         *
-         * The debug data can be a string or an array. In the case of an
-         * array it will be
-         *
-         * @param string $gatewayName        Display label
-         * @param string|array $debugData    Data to log
-         * @param string $transactionStatus  Status
-         */
         /** Save to Gateway Log: name, data array, status */
-        logTransaction($gateway["name"], $_POST, "Successful");
+        logTransaction(/**gatewayName*/$gateway["name"], /**debugData*/$_POST, "Successful");
     } else {
         /** Save to Gateway Log: name, data array, status */
-        logTransaction($gateway["name"], $_POST, "Unsuccessful");
+        logTransaction(/**gatewayName*/$gateway["name"], /**debugData*/$_POST, "Unsuccessful");
     }
 } else {
     /** Save to Gateway Log: name, data array, status */
-    logTransaction($gateway["name"], $_POST, "Bad private key in callback, check configuration");
+    logTransaction(/**gatewayName*/$gateway["name"], /**debugData*/$_POST, "Bad private key in callback, check configuration");
 }

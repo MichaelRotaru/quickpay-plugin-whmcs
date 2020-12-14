@@ -1,12 +1,10 @@
 <?php
+
 /**
- * WHMCS Sample Payment Gateway Module
+ * WHMCS QuickPay Payment Gateway Module
  *
- * Payment Gateway modules allow you to integrate payment solutions with the
- * WHMCS platform.
- *
- * This sample file demonstrates how a payment gateway module for WHMCS should
- * be structured and all supported functionality it can contain.
+ * The WHMCS QuickPay Payment Gateway Module allow you to integrate payment
+ * solutions with your WHMCS platform.
  *
  * Within the module itself, all functions must be prefixed with the module
  * filename, followed by an underscore, and then the function name. For this
@@ -17,12 +15,7 @@
  * should not define that function within your module. Only the _config
  * function is required.
  *
- * For more information, please refer to the online documentation.
- *
- * @see https://developers.whmcs.com/payment-gateways/
- *
- * @copyright Copyright (c) WHMCS Limited 2017
- * @license http://www.whmcs.com/license/ WHMCS Eula
+ * For more information, please refer to the online documentation: https://developers.whmcs.com/payment-gateways/
  */
 
 /** Require libraries needed for gateway module functions. */
@@ -46,10 +39,10 @@ if (!defined("WHMCS")) {
  */
 function quickpay_MetaData()
 {
-    return array(
+    return [
         'DisplayName' => 'QuickPay',
         'APIVersion' => '1.1'
-    );
+    ];
 }
 
 /**
@@ -67,46 +60,110 @@ function quickpay_MetaData()
  * * radio
  * * textarea
  *
- * Examples of each field type and their possible configuration parameters are
- * provided in the sample function below.
- *
  * @return array
  */
 function quickpay_config()
 {
     helper_verify_table();
 
-    return array(
+    return [
         /** the friendly display name for a payment gateway should be */
         /** defined here for backwards compatibility */
-        "FriendlyName" => array(
+        "FriendlyName" => [
             "Type" => "System",
             "Value" => "Quickpay"
-        ),
-        /** a text field type allows for single line text input */
-        "quickpay_versionnumber" => array("FriendlyName" => "Installed module version", "Type" => null, "Description" => "2.3.3", "Size" => "20", "disabled" => true),
-        "whmcs_adminname" => array("FriendlyName" => "WHMCS administrator username", "Type" => "text", "Value" => "admin", "Size" => "20",),
-        "merchant" => array("FriendlyName" => "Merchant ID", "Type" => "text", "Size" => "30",),
-        "md5secret" => array("FriendlyName" => "Payment Window Api Key", "Type" => "text", "Size" => "60",),
-        "apikey" => array("FriendlyName" => "API Key", "Type" => "text", "Size" => "60",),
-        "private_key" => array("FriendlyName" => "Private Key", "Type" => "text", "Size" => "60",),
-        "agreementid" => array("FriendlyName" => "Agreement ID", "Type" => "text", "Size" => "30",),
-        "language" => array("FriendlyName" => "Language", "Type" => "dropdown", "Options" => "da,de,en,es,fi,fr,fo,kl,it,no,nl,pl,sv,ru",),
-        "autofee" => array("FriendlyName" => "Autofee", "Type" => "dropdown", "Options" => "0,1",),
-        "autocapture" => array("FriendlyName" => "Autocapture", "Type" => "dropdown", "Options" => "0,1",),
-        "payment_methods" => array("FriendlyName" => "Payment Method", "Type" => "text", "Size" => "30", "Value" => "creditcard"),
-        "prefix" => array("FriendlyName" => "Order Prefix", "Type" => "text", "Size" => "30",),
-        "quickpay_branding_id" => array("FriendlyName" => "Branding ID", "Type" => "text", "Size" => "30",),
-        "quickpay_google_analytics_tracking_id" => array("FriendlyName" => "Google Analytics Tracking ID", "Type" => "text", "Size" => "30",),
-        "quickpay_google_analytics_client_id" => array("FriendlyName" => "Google Analytics Client ID", "Type" => "text", "Size" => "30",),
-        "link_text" => array("FriendlyName" => "Pay now text", "Type" => "text", "Value" => "Pay Now", "Size" => "60",)
-    );
+        ],
+        "quickpay_versionnumber" => [
+            "FriendlyName" => "Installed module version",
+            "Type" => null,
+            "Description" => "2.4.0",
+            "Size" => "20",
+            "disabled" => true
+        ],
+        "whmcs_adminname" => [
+            "FriendlyName" => "WHMCS administrator username",
+            "Type" => "text",
+            "Value" => "admin",
+            "Size" => "20"
+        ],
+        "merchant" => [
+            "FriendlyName" => "Merchant ID",
+            "Type" => "text",
+            "Size" => "30"
+        ],
+        "md5secret" => [
+            "FriendlyName" => "Payment Window Api Key",
+            "Type" => "text",
+            "Size" => "60"
+        ],
+        "apikey" => [
+            "FriendlyName" => "API Key",
+            "Type" => "text",
+            "Size" => "60"
+        ],
+        "private_key" => [
+            "FriendlyName" => "Private Key",
+            "Type" => "text",
+            "Size" => "60"
+        ],
+        "agreementid" => [
+            "FriendlyName" => "Agreement ID",
+            "Type" => "text",
+            "Size" => "30"
+        ],
+        "language" => [
+            "FriendlyName" => "Language",
+            "Type" => "dropdown",
+            "Options" => "da,de,en,es,fi,fr,fo,kl,it,no,nl,pl,sv,ru"
+        ],
+        "autofee" => [
+            "FriendlyName" => "Autofee",
+            "Type" => "dropdown",
+            "Options" => "0,1"
+        ],
+        "autocapture" => [
+            "FriendlyName" => "Autocapture",
+            "Type" => "dropdown",
+            "Options" => "0,1"
+        ],
+        "payment_methods" => [
+            "FriendlyName" => "Payment Method",
+            "Type" => "text",
+            "Size" => "30",
+            "Value" => "creditcard"
+        ],
+        "prefix" => [
+            "FriendlyName" => "Order Prefix",
+            "Type" => "text",
+            "Size" => "30"
+        ],
+        "quickpay_branding_id" => [
+            "FriendlyName" => "Branding ID",
+            "Type" => "text",
+            "Size" => "30"
+        ],
+        "quickpay_google_analytics_tracking_id" => [
+            "FriendlyName" => "Google Analytics Tracking ID", "
+            Type" => "text",
+            "Size" => "30"
+        ],
+        "quickpay_google_analytics_client_id" => [
+            "FriendlyName" => "Google Analytics Client ID",
+            "Type" => "text",
+            "Size" => "30",
+        ],
+        "link_text" => [
+            "FriendlyName" => "Pay now text",
+            "Type" => "text",
+            "Value" =>
+            "Pay Now",
+            "Size" => "60"
+        ],
+    ];
 }
 
 /**
  * Payment link.
- *
- * Required by third party payment gateway modules only.
  *
  * Defines the HTML output displayed on an invoice. Typically consists of an
  * HTML form that will take the user to the payment gateway endpoint.
@@ -121,19 +178,20 @@ function quickpay_link($params)
 {
     /** Get payment URL */
     $payment = helper_get_payment($params);
+
     /** Payment button HTML body */
     $code = sprintf('<a href="%s">%s</a>', $payment, $params['link_text']);
     $cart = $_GET['a'];
 
     /** Inject redirect parameters in page header */
-    if ($cart == 'complete') {
+    if ('complete' == $cart) {
         $invoiceId = $params['invoiceid'];
-        header('Location: viewinvoice.php?id='.$invoiceId.'&qpredirect=true');
+        header('Location: viewinvoice.php?id=' . $invoiceId . '&qpredirect=true');
     }
 
     /** Determine if we should autoredirect */
     if ($_GET['qpredirect']) {
-        $code .= '<script type="text/javascript">window.location.replace("'.$payment.'");</script>';
+        $code .= '<script type="text/javascript">window.location.replace("' . $payment . '");</script>';
     }
 
     return $code;
@@ -159,10 +217,11 @@ function quickpay_refund($params)
     $invoice = localAPI(/**command*/'GetInvoice', /**postData*/['invoiceid' => $params['invoiceid']]);
 
     /** Gateway request parameters */
-    $request = [ 'id'       => $params['transid']
-               , 'amount'   => str_replace('.', '', $params['amount'])
-               , 'vat_rate' => number_format((float) $invoice['taxrate'] > 0?(float) $invoice['taxrate'] : (float) $invoice['taxrate2'], 2, '.', '')
-               ];
+    $request = [
+        'id' => $params['transid'],
+        'amount' => str_replace('.', '', $params['amount']),
+        'vat_rate' => number_format((((float) $invoice['taxrate'] > 0) ? ((float) $invoice['taxrate']) : ((float) $invoice['taxrate2'])), 2, '.', '')
+    ];
 
     /** Gateway retund request */
     $response = helper_quickpay_request($params['apikey'], sprintf('payments/%s/refund', $params['transid']), $request, 'POST');
@@ -174,25 +233,25 @@ function quickpay_refund($params)
 
     /** Fail due to a gateway issue */
     if (!isset($response->id)) {
-        return array(
-          /** 'success' if successful, any other value for failure */
-          'status' => 'failed',
-           /** Data to be recorded in the gateway log */
-          'rawdata' => $response->message,
-          'transid' => $params['transid']
-      );
+        return [
+            /** 'success' if successful, any other value for failure */
+            'status' => 'failed',
+            /** Data to be recorded in the gateway log */
+            'rawdata' => $response->message,
+            'transid' => $params['transid']
+        ];
     }
 
     /** Success */
-    return array(
+    return [
         /** 'success' if successful, any other value for failure */
         'status' => 'success',
         /** Data to be recorded in the gateway log */
         'rawdata' => 'Transaction successfully refunded',
         'transid' => $params['transid'],
          /* Optional fee amount for the fee value refunded */
-        'fees' => -1 * number_format(($response->fee/100.0), 2, '.', '') /** Convert amount to decimal */
-    );
+        'fees' => ((-1) * number_format(($response->fee/100.0), 2, '.', '')) /** Convert amount to decimal */
+    ];
 }
 
 /**
@@ -226,21 +285,21 @@ function quickpay_cancelSubscription($params)
 
     /** Fail due to a gateway issue */
     if (!isset($response->id)) {
-        return array(
-          /** 'success' if successful, any other value for failure */
-          'status' => 'failed',
-           /** Data to be recorded in the gateway log - can be a string or array */
-          'rawdata' => $response->message,
-      );
+        return [
+            /** 'success' if successful, any other value for failure */
+            'status' => 'failed',
+            /** Data to be recorded in the gateway log - can be a string or array */
+            'rawdata' => $response->message
+        ];
     }
 
     /** Success */
-    return array(
+    return [
         /** 'success' if successful, any other value for failure */
         'status' => 'success',
         /** Data to be recorded in the gateway log - can be a string or array */
-        'rawdata' => 'Subscription successfully canceled',
-    );
+        'rawdata' => 'Subscription successfully canceled'
+    ];
 }
 
 /******************** Custom Quickpay functions START ***********************/
@@ -255,6 +314,7 @@ function helper_get_payment($params)
 {
     /** Get PDO and determine if payment exists and is usable */
     $pdo = Capsule::connection()->getPdo();
+
     /** Get transaction data from quickpay custom table */
     $statement = $pdo->prepare("SELECT * FROM quickpay_transactions WHERE invoice_id = :invoice_id ORDER BY id DESC");
     $statement->execute([
@@ -265,15 +325,17 @@ function helper_get_payment($params)
     $payment_type = helper_getInvoiceType($params['invoiceid']);
 
     $result = $statement->fetch();
-    if ($result > 0) {
+    if (0 < $result) {
         /** New payment needs creating */
-        if ($result['paid'] && $payment_type !== 'subscription') {
+        if ($result['paid'] && ('subscription' !== $payment_type)) {
             /** unique order id required for new payment */
-            $params['suffix'] = '_'.$statement->rowCount();
+            $params['suffix'] = '_' . $statement->rowCount();
+
         /** fall through to create payment below */
         /** Invoice amount changed, payment link needs updating */
         } elseif ($result['amount'] != $params['amount']) {
             return helper_create_payment_link($result['transaction_id'], $params, $payment_type);
+
         /** Existing payment link still OK */
         } else {
             return $result['payment_link'];
@@ -281,7 +343,7 @@ function helper_get_payment($params)
     }
 
     /** If payment | subscription doesn't exist, create it */
-    if ($payment_type === 'subscription') {
+    if ('subscription' === $payment_type) {
         $paymentlink = helper_create_subscription($params);
     } else {
         $paymentlink = helper_create_payment($params);
@@ -302,6 +364,7 @@ function helper_create_payment($params)
 {
     /** Build request parameters array */
     $request = helper_quickpay_request_params($params);
+
     /** Create gateway payment */
     $payment = helper_quickpay_request($params['apikey'], '/payments', $request, 'POST');
 
@@ -353,20 +416,14 @@ function helper_create_subscription($params)
          * Log Transaction.
          *
          * Add an entry to the Gateway Log for debugging purposes.
-         *
-         * The debug data can be a string or an array. In the case of an
-         * array it will be
-         *
-         * @param string $gatewayName        Display label
-         * @param string|array $debugData    Data to log
-         * @param string $transactionStatus  Status
          */
         logTransaction(/**gatewayName*/'quickpay', /**debugData*/['params' => $params], __FUNCTION__ . '::' . 'Create subscription request complete');
 
         /** Fail */
-        if (! isset($payment->id)) {
+        if (!isset($payment->id)) {
             throw new Exception('Failed to create subscription');
         }
+
         /** Do subscription first payment - payment link URL expected*/
         $paymentLink = helper_create_payment_link($payment->id, $params, 'subscription');
     }
@@ -392,49 +449,57 @@ function helper_create_payment_link($paymentId, $params, $type = 'payment')
     $apiKey = $params['apikey'];
 
     /** Gateway request parameters array */
-    $request = [ "amount"                       => str_replace('.', '', $params['amount'])
-               , "continue_url"                 => $params['returnurl']
-               , "cancel_url"                   => $params['returnurl']
-               , "callback_url"                 => $params['systemurl']
-               , "customer_email"               => $params['clientdetails']['email']
-               , "payment_methods"              => $params['payment_methods']
-               , "language"                     => $params['language']
-               , "auto_capture"                 => $params['autocapture']
-                /** Used for recurring payment request */
-               , "autofee"                      => $params['autofee']
-                /** Used for simple payment request */
-               , "auto_fee"                     => $params['autofee']
-               , "branding_id"                  => $params['quickpay_branding_id']
-               , "google_analytics_tracking_id" => $params['quickpay_google_analytics_tracking_id']
-               , "google_analytics_client_id"   => $params['quickpay_google_analytics_client_id']
-               ];
+    $request = [
+        "amount" => str_replace('.', '', $params['amount']),
+        "continue_url" => $params['returnurl'],
+        "cancel_url" => $params['returnurl'],
+        "callback_url" => $params['systemurl'],
+        "customer_email" => $params['clientdetails']['email'],
+        "payment_methods" => $params['payment_methods'],
+        "language" => $params['language'],
+        "auto_capture" => $params['autocapture'],
+        /** Used only for recurring payment request */
+        "autofee" => $params['autofee'],
+        /** Used only for simple payment request */
+        "auto_fee" => $params['autofee'],
+        "branding_id" => $params['quickpay_branding_id'],
+        "google_analytics_tracking_id" => $params['quickpay_google_analytics_tracking_id'],
+        "google_analytics_client_id" => $params['quickpay_google_analytics_client_id']
+    ];
 
     /** Check if transaction type is recurring */
-    if ($type === 'recurring') {
+    if ('recurring' === $type) {
         /** Construt orderid string */
         $request["order_id"] = sprintf('%s%04d_r', $orderPrefix, $params['invoiceid']);
+
         /** Request endpoint */
         $endpoint = sprintf('subscriptions/%s/recurring', $paymentId/** Subscription_id */);
         $response = helper_quickpay_request($apiKey, $endpoint, $request, 'POST');
+
         /** Current transaction id */
         $paymentId = $response->id;
 
         if (!isset($response->id)) {
             throw new Exception('Failed to create recurring payment');
         }
+
         logTransaction(/**gatewayName*/'quickpay', /**debugData*/['params' => $params], __FUNCTION__ . '::' . 'Recurring payment request complete');
     } else {
         /** Construt request endpoint URL based on payment type */
         $endpoint = sprintf('payments/%s/link', $paymentId);
-        if ($type === 'subscription') {
+
+        if ('subscription' === $type) {
             $endpoint = sprintf('subscriptions/%s/link', $paymentId);
         }
+
         /** Payment link request */
         $paymentlink = helper_quickpay_request($apiKey, $endpoint, $request, 'PUT');
+
         /** Fail */
         if (!isset($paymentlink->url)) {
             throw new Exception('Failed to create payment link');
         }
+
         logTransaction(/**gatewayName*/'quickpay', /**debugData*/['params' => $params], __FUNCTION__ . '::' . 'Create payment link request complete');
     }
 
@@ -457,7 +522,7 @@ function helper_create_payment_link($paymentId, $params, $type = 'payment')
             ':invoice_id' => $params['invoiceid'],
             ':transaction_id' => $paymentId,
             ':payment_link' => (isset($paymentlink->url)) ? ($paymentlink->url) : (''),
-            ':amount' => $params['amount'],
+            ':amount' => $params['amount']
         ]);
 
         $pdo->commit();
@@ -481,39 +546,41 @@ function helper_create_payment_link($paymentId, $params, $type = 'payment')
 function helper_quickpay_request_params($params)
 {
     /** Order Parameters */
-    $request_arr = [ 'currency' => $params['currency']
-                   , 'order_id' => sprintf('%s%04d%s', $params['prefix'], $params['invoiceid'], isset($params['suffix'])?$params['suffix']:'')
-                   , 'description' => $params['description']
-                   , 'branding_id' => $params['quickpay_branding_id']
-                   ];
-    /** Invoice Parameters */
-    $invoice_address = [ 'name' => $params['clientdetails']['firstname'].' '.$params['clientdetails']['lastname']
-                       , 'company_name' => $params['clientdetails']['companyname']
-                       , 'street' => (!empty($params['clientdetails']['address2'])) ? ($params['clientdetails']['address1'] . ', ' . $params['clientdetails']['address2']) : ($params['clientdetails']['address1'])
-                       , 'city' => $params['clientdetails']['city']
-                       , 'zip_code' => $params['clientdetails']['postcode']
-                       , 'region' => $params['clientdetails']['state']
-                       , 'country_code' => QuickPay_Countries::getAlpha3FromAlpha2($params['clientdetails']['countrycode'])
-                       , 'phone_number' => $params['clientdetails']['phonenumber']
-                       , 'email' => $params['clientdetails']['email']
-                       ];
+    $request_arr = [
+        'currency' => $params['currency'],
+        'order_id' => sprintf('%s%04d%s', $params['prefix'], $params['invoiceid'], (isset($params['suffix']) ? $params['suffix'] : '')),
+        'description' => $params['description'],
+        'branding_id' => $params['quickpay_branding_id']
+    ];
 
-    $request_arr['invoice_address'] = $invoice_address;
+    /** Invoice Parameters */
+    $request_arr['invoice_address'] = [
+        'name' => $params['clientdetails']['firstname'] . ' ' . $params['clientdetails']['lastname'],
+        'company_name' => $params['clientdetails']['companyname'],
+        'street' => ((!empty($params['clientdetails']['address2'])) ? ($params['clientdetails']['address1'] . ', ' . $params['clientdetails']['address2']) : ($params['clientdetails']['address1'])),
+        'city' => $params['clientdetails']['city'],
+        'zip_code' => $params['clientdetails']['postcode'],
+        'region' => $params['clientdetails']['state'],
+        'country_code' => QuickPay_Countries::getAlpha3FromAlpha2($params['clientdetails']['countrycode']),
+        'phone_number' => $params['clientdetails']['phonenumber'],
+        'email' => $params['clientdetails']['email']
+    ];
 
     /** Extract the invoice items details. */
     $invoice = localAPI(/**command*/'GetInvoice', /**postData*/['invoiceid' => $params['invoiceid']]);
 
     /** Cart Items Parameters */
-    $basket = [];
+    $request_arr['basket'] = [];
     foreach ($invoice['items']['item'] as $item) {
-        $basket[] = [ 'qty' => 1
-                    , 'item_no' => (string)$item['id']
-                    , 'item_name' => $item['description']
-                    , 'item_price' => (int) $item['amount']
-                    , 'vat_rate' => number_format((((float) $invoice['taxrate']) > 0) ? ((float) $invoice['taxrate']) : ((float) $invoice['taxrate2']), 2, '.', '')
-                    ];
+        $request_arr['basket'][] = [
+            'qty' => 1,
+            'item_no' => (string)$item['id'],
+            'item_name' => $item['description'],
+            'item_price' => (int) $item['amount'],
+            'vat_rate' => number_format((((float) $invoice['taxrate']) > 0) ? ((float) $invoice['taxrate']) : ((float) $invoice['taxrate2']), 2, '.', '')
+        ];
     }
-    $request_arr['basket'] = $basket;
+
     return $request_arr;
 }
 
@@ -527,20 +594,20 @@ function helper_quickpay_request_params($params)
  * @return mixed
  * @throws Exception
  */
-function helper_quickpay_request($apikey = '', $endpoint = '', $params = array(), $method = 'GET')
+function helper_quickpay_request($apikey = '', $endpoint = '', $params = [], $method = 'GET')
 {
     /** Endpoint URL */
     $url = 'https://api.quickpay.net/' . $endpoint;
 
     /** Request header */
-    $headers = array(
+    $headers = [
         'Accept-Version: v10',
         'Accept: application/json',
         'Authorization: Basic ' . base64_encode(':' . $apikey),
-    );
+    ];
 
     /** Request parameters */
-    $options = array(
+    $options = [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
@@ -548,7 +615,7 @@ function helper_quickpay_request($apikey = '', $endpoint = '', $params = array()
         CURLOPT_CUSTOMREQUEST => $method,
         CURLOPT_URL => $url,
         CURLOPT_POSTFIELDS => preg_replace('/%5B[0-9]+%5D/simU', '%5B%5D', http_build_query($params, '', '&')),
-    );
+    ];
 
     /** Do request */
     $ch = curl_init();
@@ -556,20 +623,19 @@ function helper_quickpay_request($apikey = '', $endpoint = '', $params = array()
     $response = curl_exec($ch);
 
     /** Check for errors */
-    if (curl_errno($ch) !== 0) {
+    if (0 !== curl_errno($ch)) {
         /** Fail */
         throw new Exception(curl_error($ch), curl_errno($ch));
     }
 
     /** Close request */
     curl_close($ch);
+
     return json_decode($response);
 }
-
 /******************** Custom Quickpay functions END *************************/
 
 /**************** Custom Quickpay DB table functions START ******************/
-
 /**
  * Install quickpay custom table
  *
@@ -598,7 +664,7 @@ function helper_install_table(PDO $pdo)
     } catch (\Exception $e) {
         /** Fail */
         $pdo->rollBack();
-        logActivity('Error during quickpay table creation: '.$e->getMessage());
+        logActivity('Error during quickpay table creation: ' . $e->getMessage());
     }
 }
 
@@ -623,7 +689,7 @@ function helper_update_table(PDO $pdo)
     } catch (\Exception $e) {
         /** Fail */
         $pdo->rollBack();
-        logActivity('Error during quickpay table update: '.$e->getMessage());
+        logActivity('Error during quickpay table update: ' . $e->getMessage());
     }
 }
 
@@ -639,24 +705,22 @@ function helper_verify_table()
     $row = $result->fetch(PDO::FETCH_ASSOC);
 
     /** If not create it */
-    if ($row === false) {
+    if (false === $row) {
         helper_install_table($pdo);
     } else {
         /** check table has columns added in 2020_07 version */
         $result = $pdo->query("SHOW COLUMNS FROM `quickpay_transactions` LIKE 'amount'");
         $row = $result->fetch(PDO::FETCH_ASSOC);
 
-        if ($row === false) {
+        if (false === $row) {
             /** If not, add them */
             helper_update_table($pdo);
         }
     }
 }
-
 /****************** Custom Quickpay DB table functions END ******************/
 
 /************************** Utils functions START **************************/
-
 /** Determine if invoice is part of subscription or not
  * @param string $invoiceid
  *
@@ -671,5 +735,4 @@ function helper_getInvoiceType($invoiceid)
         return 'payment';
     }
 }
-
 /************************** Utils functions END **************************/
