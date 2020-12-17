@@ -416,6 +416,7 @@ function helper_create_payment_link($paymentId, $params, $type = 'payment')
         /** Request endpoint */
         $endpoint = sprintf('subscriptions/%s/recurring', $paymentId/** Subscription_id */);
         $response = helper_quickpay_request($apiKey, $endpoint, $request, 'POST');
+        logActivity('Quickpay payment response: '.json_encode($response));
         /** Current transaction id */
         $paymentId = $response->id;
 
@@ -431,6 +432,7 @@ function helper_create_payment_link($paymentId, $params, $type = 'payment')
         }
         /** Payment link request */
         $paymentlink = helper_quickpay_request($apiKey, $endpoint, $request, 'PUT');
+        logActivity('Quickpay payment response: '.json_encode($paymentlink));
         /** Fail */
         if (!isset($paymentlink->url)) {
             throw new Exception('Failed to create payment link');
