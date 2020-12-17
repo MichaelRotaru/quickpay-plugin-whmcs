@@ -395,7 +395,7 @@ function helper_create_payment_link($paymentId, $params, $type = 'payment')
     $request = [ "amount"                       => str_replace('.', '', $params['amount'])
                , "continue_url"                 => $params['returnurl']
                , "cancel_url"                   => $params['returnurl']
-               , "callback_url"                 => $params['systemurl']
+               , "callback_url"                 => (isset($params['callback_url']))?$params['callback_url']:$params['systemurl'] . 'modules/gateways/callback/' . $params['paymentmethod'] . '.php'
                , "customer_email"               => $params['clientdetails']['email']
                , "payment_methods"              => $params['payment_methods']
                , "language"                     => $params['language']
