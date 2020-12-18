@@ -392,10 +392,10 @@ function helper_create_subscription($params)
     $activeSubscriptionId = null;
     $paymentLink = null;
 
-    /** Get invoice parent order recurring values */
+    /** Get invoice parent order recurring values. */
     $recurringData = getRecurringBillingValues($params['invoiceid']);
 
-    /** Check if invoice parent order is subscription type*/
+    /** Check if invoice parent order is subscription type. */
     if ($recurringData && isset($recurringData['primaryserviceid'])) {
         /** Get active subscription id */
         $result = select_query("tblhosting", "id, subscriptionid", ["orderid" => $recurringData['primaryserviceid']]);
