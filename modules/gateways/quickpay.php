@@ -453,7 +453,7 @@ function helper_create_payment_link($paymentId, $params, $type = 'payment')
         "amount" => str_replace('.', '', $params['amount']),
         "continue_url" => $params['returnurl'],
         "cancel_url" => $params['returnurl'],
-        "callback_url" => $params['systemurl'],
+        "callback_url" => (isset($params['callback_url'])) ? ($params['callback_url']) : ($params['systemurl'] . 'modules/gateways/callback/' . $params['paymentmethod'] . '.php'),
         "customer_email" => $params['clientdetails']['email'],
         "payment_methods" => $params['payment_methods'],
         "language" => $params['language'],
@@ -476,6 +476,8 @@ function helper_create_payment_link($paymentId, $params, $type = 'payment')
         $endpoint = sprintf('subscriptions/%s/recurring', $paymentId/** Subscription_id */);
         $response = helper_quickpay_request($apiKey, $endpoint, $request, 'POST');
 
+        logActivity('Quickpay payment response: ' . json_encode($response));
+
         /** Current transaction id */
         $paymentId = $response->id;
 
@@ -494,6 +496,8 @@ function helper_create_payment_link($paymentId, $params, $type = 'payment')
 
         /** Payment link request */
         $paymentlink = helper_quickpay_request($apiKey, $endpoint, $request, 'PUT');
+
+        logActivity('Quickpay payment response: ' . json_encode($paymentlink));
 
         /** Fail */
         if (!isset($paymentlink->url)) {
