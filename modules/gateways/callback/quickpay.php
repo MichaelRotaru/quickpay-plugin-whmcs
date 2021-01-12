@@ -97,8 +97,8 @@ if ($checksum === $_SERVER["HTTP_QUICKPAY_CHECKSUM_SHA256"]) {
             $values = [
                 'invoiceid' => $invoiceid,
                 'transid' => $transid,
-                'amount' => $amount,
-                'fee' => $fee,
+                'amount' => $tblinvoices['total'],
+                'fees' => $fee,
                 'gateway' => $gatewayModuleName
             ];
 
