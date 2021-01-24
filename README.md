@@ -14,6 +14,8 @@ Pull requests welcome!
   * Upload the content to your modules/gateways/ folder;
   * Activate the gateway in the WHMCS admin area setup > payment > payment gateway;
   * Configure gateway.
+  * In order to setup a Custom Thank You Page fill the "Custom Thank You Page URL" field with the internal path to your custom page.
+  (i.e. custompages/thankyoupage.php). Leave the field empty for default WHMCS Thank You Page.
 
 
 ## Changelog
@@ -28,3 +30,4 @@ Pull requests welcome!
     - Manual from Admin > Order screen;
     - Automatic at expiration.
  * Added "Refund" functionality for simple and recurring payments, can be triggered from Admin > Invoice screen.
+ * Added "Custom Thank You Page" setup.
