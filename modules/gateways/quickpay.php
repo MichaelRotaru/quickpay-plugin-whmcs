@@ -454,7 +454,7 @@ function helper_create_payment_link($paymentId, $params, $type = 'payment')
     $apiKey = $params['apikey'];
 
     /** If quickpay_custom_thankyou_url field is empty set return URL to default value */
-    $return_url = empty($params['quickpay_custom_thankyou_url'])?$params['returnurl']:$params['systemurl'].$params['quickpay_custom_thankyou_url'];
+    $return_url = (empty($params['quickpay_custom_thankyou_url'])) ? ($params['returnurl']) : ($params['systemurl'] . $params['quickpay_custom_thankyou_url']);
 
     /** Gateway request parameters array */
     $request = [
