@@ -143,7 +143,7 @@ function quickpay_config()
             "Size" => "30"
         ],
         "quickpay_custom_thankyou_url" => [
-            "FriendlyName" => "Custom ThankYou Page URL",
+            "FriendlyName" => "Custom Thank-You Page URL",
             "Type" => "text",
             "Size" => "60"
         ],
