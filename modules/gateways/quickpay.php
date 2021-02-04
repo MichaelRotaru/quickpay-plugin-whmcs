@@ -225,7 +225,7 @@ function quickpay_refund($params)
     $request = [
         'id' => $params['transid'],
         'amount' => str_replace('.', '', $params['amount']),
-        'vat_rate' => number_format((((float) $invoice['taxrate'] > 0) ? ((float) $invoice['taxrate']) : ((float) $invoice['taxrate2'])), 2, '.', '')
+        // 'vat_rate' => number_format((((float) $invoice['taxrate'] > 0) ? ((float) $invoice['taxrate']) : ((float) $invoice['taxrate2'])), 2, '.', '')
     ];
 
     /** Gateway retund request */
@@ -584,13 +584,25 @@ function helper_quickpay_request_params($params)
 
     /** Cart Items Parameters */
     $request_arr['basket'] = [];
+
+    /** TAX percent calculation related to order total*/
+    $total = 0;
     foreach ($invoice['items']['item'] as $item) {
+        $total += (float) $item['amount'];
+    }
+    $total = number_format( ((float) $total) , 2, '.', '');
+    $tax_1 = number_format( ((float) $invoice['tax']) , 2, '.', '');
+    $tax_2 = number_format( ((float) $invoice['tax2']) , 2, '.', '');
+    $total_taxrate = number_format((($tax_1 + $tax_2) / $total ), 3);
+
+    foreach ($invoice['items']['item'] as $item) {
+        $item_price = (int) $item['amount'];
         $request_arr['basket'][] = [
             'qty' => 1,
             'item_no' => (string)$item['id'],
             'item_name' => $item['description'],
             'item_price' => (int) $item['amount'],
-            'vat_rate' => number_format((((float) $invoice['taxrate']) > 0) ? ((float) $invoice['taxrate']) : ((float) $invoice['taxrate2']), 2, '.', '')
+            'vat_rate' => $item['taxed']==1?$total_taxrate:'0'
         ];
     }
 
