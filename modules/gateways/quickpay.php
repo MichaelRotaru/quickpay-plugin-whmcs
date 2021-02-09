@@ -220,26 +220,11 @@ function quickpay_refund($params)
 
     /** Get invoice data */
     $invoice = localAPI(/**command*/'GetInvoice', /**postData*/['invoiceid' => $params['invoiceid']]);
-
-    /** Gateway request parameters */
-    $total = 0;
-    foreach ($invoice['items']['item'] as $item) {
-        if($item['taxed']==1){
-            $total += (float) $item['amount'];
-        }
-    }
-    
-    /** TAX percent calculation besed on order total*/
-    $total = number_format( ((float) $total) , 2, '.', '');
-    $tax_1 = number_format( ((float) $invoice['tax']) , 2, '.', '');
-    $tax_2 = number_format( ((float) $invoice['tax2']) , 2, '.', '');
-    $total_taxrate = number_format((($tax_1 + $tax_2) / $total ), 3);
-
-    /** Calculate taxed items total */
+      
     $request = [
         'id' => $params['transid'],
         'amount' => str_replace('.', '', $params['amount']),
-        'vat_rate' => $total_taxrate
+        'vat_rate' => quickpay_getTotalTaxRate($invoice)
     ];
 
     /** Gateway retund request */
@@ -598,20 +583,7 @@ function helper_quickpay_request_params($params)
 
     /** Cart Items Parameters */
     $request_arr['basket'] = [];
-
-    $total = 0;
-    /** Calculate taxed items total */
-    foreach ($invoice['items']['item'] as $item) {
-        if($item['taxed']==1){
-            $total += (float) $item['amount'];
-        }
-    }
-    /** TAX percent calculation related to order total*/
-    $total = number_format( ((float) $total) , 2, '.', '');
-    $tax_1 = number_format( ((float) $invoice['tax']) , 2, '.', '');
-    $tax_2 = number_format( ((float) $invoice['tax2']) , 2, '.', '');
-    $total_taxrate = number_format((($tax_1 + $tax_2) / $total ), 3);
-
+    $total_taxrate = quickpay_getTotalTaxRate($invoice);
     foreach ($invoice['items']['item'] as $item) {
         $item_price = (int) $item['amount'];
         $request_arr['basket'][] = [
@@ -781,5 +753,27 @@ function helper_getInvoiceType($invoiceid)
     } else {
         return 'payment';
     }
+}
+
+/**
+ * Calculate the total taxrate from the invoice
+ *
+ * @param array $invoice The invoice data
+ *
+ * @return float Total invoice taxrate
+ */
+function quickpay_getTotalTaxRate($invoice){
+   $total = 0;
+   /** Calculate price of taxable items */
+   foreach ($invoice['items']['item'] as $item) {
+       if($item['taxed']==1){
+           $total += (float) $item['amount'];
+       }
+   }
+   $total = number_format( ((float) $total) , 2, '.', '');
+   $tax_1 = number_format( ((float) $invoice['tax']) , 2, '.', '');
+   $tax_2 = number_format( ((float) $invoice['tax2']) , 2, '.', '');
+   /** Add all taxes */
+   return number_format((($tax_1 + $tax_2) / $total ), 3);
 }
 /************************** Utils functions END **************************/
